@@ -166,6 +166,13 @@ namespace Texture
 		{
 		glDeleteTextures(1, &id);
 		id = texId;
+		if(id){
+		//テクスチャの幅と高さを取得する
+			glBindTexture(GL_TEXTURE_2D, id);
+			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
 		}
 	
 		/**
@@ -187,6 +194,15 @@ namespace Texture
 		GLuint Image2D::Get() const
 		{
 		return id;
+		}
+
+		/**
+		*2Dテクスチャを作成する
+		*/
+		Image2DPtr Image2D::Create(const char*path) {
+
+			return std::make_shared<Image2D>(LoadImage2D(path));
+
 		}
 	
 

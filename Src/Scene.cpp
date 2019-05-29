@@ -178,8 +178,11 @@ bool SceneStack::Empty() const {
 *シーンを更新する
 */
 void SceneStack::Update(float deltaTime) {
-	for (ScenePtr&e : stack) {
+	/*for (ScenePtr&e : stack) {
 		e->ProcessInput();
+	}*/
+	if (!Empty()) {
+		Current().ProcessInput();
 	}
 	for (ScenePtr&e : stack) {
 		e->Update(deltaTime);
