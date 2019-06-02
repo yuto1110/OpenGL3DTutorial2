@@ -40,6 +40,6 @@ private:
 		glm::vec2 offset = glm::vec2(0);//表示位置の補正位置
 		float xadvance = 0;//次の文字を表示する位置
 	};
-	std::vector<CharacterInfo>charactorInfoList;//文字情報のリスト
+	std::vector<CharacterInfo>characterInfoList;//文字情報のリスト
 };
 #endif // !FONT_H_INCLUDED

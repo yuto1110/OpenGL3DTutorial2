@@ -23,8 +23,8 @@ bool FontRenderer::LoadFromFile(const char*filename) {
 	int line = 1;//読み込む番号(エラー表示用)
 	int spacing[2];//1行目の読み込みチェック用
 	int ret = fscanf(fp.get(),
-		"info face=\"%*[^\"]\"size=%*d bold=%*d charset=%*s unicode=%*d"
-		"stretchH=%*d smooth=%*d aa%*d padding=%*d,%*d,%*d,%*d spacing=%*d,%d%*[^\n]",
+		"info face=\"%*[^\"]\" size=%*d bold=%*d italic=%*d charset=%*s unicode=%*d"
+		"stretchH = %*d smooth = %*d aa = %*d padding = %*d, %*d, %*d, %*d spacing = %d, %d%*[^\n]",
 		&spacing[0], &spacing[1]);
 	if (ret < 2) {
 		std::cerr << "[エラー]" << __func__ << ":" << filename << "の読み込みに失敗(" << line << "行目).\n";
@@ -34,7 +34,7 @@ bool FontRenderer::LoadFromFile(const char*filename) {
 	//common行を読み込む
 	float scaleH;
 	ret = fscanf(fp.get(),
-		"common lineHeight=&f base=%f scaleW=&d scaleH%f pages=%*d packed=%*d%*[^\n]",
+		" common lineHeight=%f base=%f scaleW=%*d scaleH=%f pages=%*d packed=%*d%*[^\n]",
 		&lineHeight, &base, &scaleH);
 	if (ret < 3) {
 		std::cerr << "[エラー]" << __func__ << ":" << filename << "の読み込み失敗(" << line << "行目).\n";
@@ -71,5 +71,87 @@ bool FontRenderer::LoadFromFile(const char*filename) {
 	}
 	++line;
 	//char行を読み込む
+	characterInfoList.clear();
+	characterInfoList.resize(65536);//16bitで表せる範囲を確保
+	for (int i = 0; i < charCount; ++i) {
+		CharacterInfo info;
+		ret = fscanf(fp.get(),
+			"char id%d x=%f y=%f width=%f height=%f xoffset=%f yoffset=%f xadvance=%f"
+			"page=%d chnl=%d",
+			&info.id, &info.uv.x, &info.uv.y, &info.size.x, &info.size.y,
+			&info.offset.x, &info.offset.y, &info.xadvance, &info.page);
+		if (ret < 9) {
+			std::cerr << "[エラー]" << __func__ << ":" << filename << "の読み込みに失敗(" << line << "行目).\n";
+			return false;
+		}
+		//フォントファイルは左上が原点なので、openGLの座標系に変換
+		info.uv.y = scaleH - info.uv.y - info.size.y;
+		if (info.id < characterInfoList.size()) {
+			characterInfoList[info.id] = info;
+		}
+		++line;
+	}
+	//テクスチャを読み込む
+	textures.clear();
+	textures.reserve(texNameList.size());
+	for (const std::string&e : texNameList) {
+		Texture::Image2DPtr tex = Texture::Image2D::Create(e.c_str());
+		if (!tex) {
+			return false;
+		}
+		textures.push_back(tex);
+	}
 	return true;
+}
+
+/**
+*文字列の追加を開始する
+*/
+void FontRenderer::BeginUpdate() {
+	spriteRenderer.BeginUpdate();
+}
+
+/**
+*文字列を追加する
+*/
+bool FontRenderer::AddString(const glm::vec2&position, const wchar_t*str) {
+	glm::vec2 pos = position;
+	for (const wchar_t*itr = str; *itr; ++itr) {
+		const CharacterInfo& info = characterInfoList[*itr];
+		if (info.id >= 0 && info.size.x&&info.size.y) {
+			//スプライトの座標は画像の中心を指定するがフォントは左上を指定する
+			//そこでその差を打ち消すための補正値を計算する
+			const float baseX = info.size.x*0.5f - info.offset.x;
+			const float baseY = info.size.y*0.5f - info.offset.y;
+			const glm::vec3 spritePos = glm::vec3(pos + glm::vec2(baseX, baseY), 0);
+
+			Sprite sprite(textures[info.page]);
+			sprite.Position(spritePos);
+			sprite.Rectangle({ info.uv,info.size });
+			if (!spriteRenderer.AddVertices(sprite)) {
+				return false;
+			}
+		}
+		pos.x += info.xadvance;//次の表示位置へ移動
+	}
+	return true;
+}
+/**
+*文字列の追加を終了する
+*/
+void FontRenderer::EndUpdate() {
+	spriteRenderer.EndUpdate();
+}
+
+/**
+*フォントを描画する
+*/
+void FontRenderer::Draw(const glm::vec2&screenSize) const {
+	spriteRenderer.Draw(screenSize);
+}
+/**
+*行の高さを取得する
+*/
+float FontRenderer::LineHeight()const {
+	return lineHeight;
 }

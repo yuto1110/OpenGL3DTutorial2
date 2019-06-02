@@ -2,6 +2,7 @@
 #define TITLESCENE_H_INCLUDED
 #include "Scene.h"
 #include"Sprite.h"
+#include"Font.h"
 #include<vector>
 
 class TitleScene :public Scene {
@@ -18,5 +19,6 @@ public:
 private:
 	std::vector<Sprite>sprites;
 	SpriteRenderer spriteRenderer;
+	FontRenderer fontRenderer;
 };
 #endif // !TITLESCENE_H_INCLLUDED
