@@ -2,6 +2,7 @@
 #define STATUSSCENE_H_INCLUDED
 #include"Scene.h"
 #include"Sprite.h"
+#include"Font.h"
 #include<vector>
 
 class StatusScene :public Scene {
@@ -17,5 +18,6 @@ public:
 private:
 	std::vector<Sprite>sprites;
 	SpriteRenderer spriteRenderer;
+	FontRenderer fontRenderer;
 };
 #endif
