@@ -32,9 +32,6 @@
     <ClCompile Include="Src\GLFWEW.cpp">
       <Filter>Src</Filter>
     </ClCompile>
-    <ClCompile Include="BufferObject.cpp">
-      <Filter>Src</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Texture.cpp">
       <Filter>Src</Filter>
     </ClCompile>
@@ -45,6 +42,12 @@
       <Filter>Src</Filter>
     </ClCompile>
     <ClCompile Include="Src\Font.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\BufferObject.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Mesh.cpp">
       <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,6 +89,9 @@
       <Filter>Src</Filter>
     </ClInclude>
     <ClInclude Include="Src\Font.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Mesh.h">
       <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>

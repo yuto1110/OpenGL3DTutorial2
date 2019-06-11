@@ -1,4 +1,4 @@
-#include "Src\BufferObject.h"
+#include "BufferObject.h"
 #include <iostream>
 /**
 *バッファオブジェクトを作成する
