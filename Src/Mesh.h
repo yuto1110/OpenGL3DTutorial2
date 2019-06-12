@@ -77,7 +77,7 @@ namespace Mesh {
 		~Buffer() = default;
 
 		bool Init(GLsizeiptr vboSize, GLsizeiptr iboSize);
-		GLintptr AddvertexData(const void*data, size_t size);
+		GLintptr AddVertexData(const void*data, size_t size);
 		GLintptr AddIndexData(const void*data, size_t size);
 		Primitive CreatePrimitive(size_t count, GLenum type, size_t iOffset, size_t vOffset)const;
 		Material CreateMaterial(const glm::vec4&color, Texture::Image2DPtr texture)const;

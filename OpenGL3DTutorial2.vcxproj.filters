@@ -103,6 +103,12 @@
     <None Include="Res\Sprite.frag">
       <Filter>Res</Filter>
     </None>
+    <None Include="Res\StaticMesh.frag">
+      <Filter>Res</Filter>
+    </None>
+    <None Include="Res\StaticMesh.vert">
+      <Filter>Res</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Res\TitleBg.tga">

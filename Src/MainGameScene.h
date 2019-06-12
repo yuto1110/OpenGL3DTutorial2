@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include"Sprite.h"
 #include"Font.h"
+#include"Mesh.h"
 #include<vector>
 
 
@@ -22,5 +23,6 @@ private:
 	std::vector<Sprite>sprites;
 	SpriteRenderer spriteRenderer;
 	FontRenderer fontRenderer;
+	Mesh::Buffer meshBuffer;
 };
 #endif // !MAINGAMESCENE_H_INCLUDED

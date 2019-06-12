@@ -10,6 +10,7 @@ bool GameOverScene::Initialize() {
 	sprites.push_back(spr);
 	fontRenderer.Init(1000);
 	fontRenderer.LoadFromFile("Res/font.fnt");
+	
 	return true;
 }
 void GameOverScene::ProcessInput() {

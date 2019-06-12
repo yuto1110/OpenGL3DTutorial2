@@ -36,7 +36,7 @@ namespace Mesh {
 /**
 *頂点データを追加する
 */
-	 GLintptr Buffer::AddvertexData(const void*data, size_t size) {
+	 GLintptr Buffer::AddVertexData(const void*data, size_t size) {
 		 vbo.BufferSubData(vboEnd, size, data);
 		 const GLintptr tmp = vboEnd;
 		 vboEnd += size;
@@ -129,85 +129,99 @@ namespace Mesh {
 	 void Buffer::Addcube(const char*name) {
 
 		 //    6---7      +Y -Z
-		 //   /|  /|       |/
-		 //  / 5-/-4  -X --*-- +X
-		 // 3---2 /       /|
-		 // |/  |/    +Z -Y
-		 // 0---1
-		 const glm::vec3 basePotisions[] = {
-		 {-1,-1,1},{1,-1,1},{1,1,1},{-1,1,1},
-		 {1,-1,-1},{-1,-1,-1},{-1,1,-1},{1,1,-1},
-		 };
-		 const glm::vec2 baseTexCoords[] = { {0,1},{0,0},{1,0},{1,1} };
+		   //   /|  /|       |/
+			   //  / 5-/-4  -X --*-- +X
+			   // 3---2 /       /|
+			   // |/  |/     +Z -Y
+			   // 0---1
+			 const glm::vec3 basePositions[] = {
+			 {-1,-1, 1}, { 1,-1, 1}, { 1, 1, 1}, {-1, 1, 1},
+			 { 1,-1,-1}, {-1,-1,-1}, {-1, 1,-1}, { 1, 1,-1},
+			 };
+		 const glm::vec2 baseTexCoords[] = { { 0, 1}, { 0, 0}, { 1, 0}, { 1, 1} };
 		 const glm::vec3 normals[] = {
-			 {0,0,1},{1,0,0},{0,0,-1},{-1,0,0},
-		 {0,-1,0},{0,1,0} };
+		 { 0, 0, 1}, { 1, 0, 0}, { 0, 0,-1}, {-1, 0, 0},
+		 { 0, -1, 0}, { 0, 1, 0} };
 		 const int planes[6][4] = {
-			 {0,1,2,3},{1,4,7,2},{4,5,6,7},{5,0,3,6},
-		 {5,4,1,0},{3,2,7,6} };
-		 const GLubyte baseIndices[] = { 0,1,2,2,3,0 };
-
-		 std::vector<Vertex>vertices;
+		 { 0, 1, 2, 3}, { 1, 4, 7, 2}, { 4, 5, 6, 7}, { 5, 0, 3, 6},
+		 { 5, 4, 1, 0}, { 3, 2, 7, 6} };
+		 const GLubyte baseIndices[] = { 0, 1, 2, 2, 3, 0 };
+		 
+		 std::vector<Vertex> vertices;
 		 vertices.reserve(4 * 6);
-		 std::vector<GLubyte>indices;
+		 std::vector<GLubyte> indices;
 		 indices.reserve(6 * 6);
 
-		 //頂点データとインデックスデータを作成
+		 // 頂点データとインデックスデータを作成.
 		 for (size_t plane = 0; plane < 6; ++plane) {
-			 for (size_t i =0 ; i < 4; ++i) {
+			for (size_t i = 0; i < 4; ++i) {
 				 Vertex v;
-				 v.position = basePotisions[planes[plane][i]];
+				 v.position = basePositions[planes[plane][i]];
 				 v.texCoord = baseTexCoords[i];
 				 v.normal = normals[plane];
 				 vertices.push_back(v);
+				 
 			 }
 			 for (size_t i = 0; i < 6; ++i) {
 				 indices.push_back(static_cast<GLubyte>(baseIndices[i] + (plane * 4)));
+				 
 			 }
+			 
 		 }
-		 //メッシュの追加
+		 // メッシュを追加.
 		 const size_t vOffset =
-			 AddvertexData(vertices.data(), vertices.size() * sizeof(Vertex));
+		     AddVertexData(vertices.data(), vertices.size() * sizeof(Vertex));
 		 const size_t iOffset =
 			 AddIndexData(indices.data(), indices.size() * sizeof(GLubyte));
 		 const Primitive p =
 			 CreatePrimitive(indices.size(), GL_UNSIGNED_BYTE, iOffset, vOffset);
 		 const Material m = CreateMaterial(glm::vec4(1), nullptr);
-		 AddMesh(name, p, m);
+		 
+		AddMesh(name, p, m);
+		 
 	 }
 
 	 /**
 	 *メッシュを描画する
 	 */
-	 void Draw(const FilePtr&file, const glm::mat4&matVP, const glm::mat4&matM) {
+	 void Draw(const FilePtr& file, const glm::mat4& matVP, const glm::mat4& matM)
+		  {
 		 if (!file || file->meshes.empty() || file->materials.empty()) {
 			 return;
+			 
 		 }
-		 const Mesh&mesh = file->meshes[0];
-		 for(const Primitive&p:mesh.primitives){
-			 if (p.material < file->materials.size()) {
+		 
+			const Mesh& mesh = file->meshes[0];
+		 for (const Primitive& p : mesh.primitives) {
+			if (p.material < file->materials.size()) {
 				 p.vao->Bind();
-				 const Material&m = file->materials[p.material];
+				 const Material& m = file->materials[p.material];
 				 m.program->Use();
 				 m.program->SetViewProjectionMatrix(matVP);
-				 m.program->SetModelMatrix(matM );
+				 m.program->SetModelMatrix(matM);
 				 glActiveTexture(GL_TEXTURE0);
-
-				 //テクスチャがあるときは、そのテクスチャIDを設定する。ないときは0を設定する
-				 if (m.texture) {
+				 
+					       // テクスチャがあるときは、そのテクスチャIDを設定する. ないときは0を設定する.
+					 if (m.texture) {
 					 glBindTexture(GL_TEXTURE_2D, m.texture->Get());
+					 
 				 }
-				 else {
+					 else {
 					 glBindTexture(GL_TEXTURE_2D, 0);
+					 
 				 }
-				 glDrawElementsBaseVertex(p.mode, p.count, p.type, p.indices, p.baseVertex);
+				 
+					 glDrawElementsBaseVertex(p.mode, p.count, p.type, p.indices, p.baseVertex);
 				 p.vao->Unbind();
-			}
+				 
+			 }
+			 
 		 }
 		 glActiveTexture(GL_TEXTURE0);
 		 glBindTexture(GL_TEXTURE_2D, 0);
 		 glUseProgram(0);
 	 }
+
 
 
 }//namespace Mesh
