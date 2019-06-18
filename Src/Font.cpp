@@ -127,8 +127,9 @@ void FontRenderer::BeginUpdate() {
 /**
 *•¶Žš—ñ‚ð’Ç‰Á‚·‚é
 */
-bool FontRenderer::AddString(const glm::vec2&position, const wchar_t*str) {
+bool FontRenderer::AddString(const glm::vec2&position,const glm::vec4&color, const wchar_t*str) {
 	glm::vec2 pos = position;
+	glm::vec4 col = color;
 	for (const wchar_t*itr = str; *itr; ++itr) {
 		const CharacterInfo& info = characterInfoList[*itr];
 		if (info.id >= 0 && info.size.x&&info.size.y) {

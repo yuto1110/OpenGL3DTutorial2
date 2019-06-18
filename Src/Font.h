@@ -22,7 +22,7 @@ public:
 	bool Init(size_t maxChar);
 	bool LoadFromFile(const char*path);
 	void BeginUpdate();
-	bool AddString(const glm::vec2&, const wchar_t*);
+	bool AddString(const glm::vec2&,const glm::vec4&, const wchar_t*);
 	void EndUpdate();
 	void Draw(const glm::vec2&)const;
 	float LineHeight()const;
