@@ -7,6 +7,7 @@
 #include"BufferObject.h"
 #include"Texture.h"
 #include"Shader.h"
+#include"json11\json11.hpp"
 #include<glm\glm.hpp>
 #include<vector>
 #include<unordered_map>
@@ -82,8 +83,11 @@ namespace Mesh {
 		Primitive CreatePrimitive(size_t count, GLenum type, size_t iOffset, size_t vOffset)const;
 		Material CreateMaterial(const glm::vec4&color, Texture::Image2DPtr texture)const;
 		bool AddMesh(const char*name, const Primitive&primitive, const Material&material);
+		bool SetAttribute(Primitive*, int, const json11::Json&, const json11::Json&, const std::vector<std::vector<char>>&);
+		bool LoadMesh(const char*path);
 		FilePtr GetFile(const char*name)const;
 
+		void SetViewProjectionMatrix(const glm::mat4&)const;
 		void Addcube(const char*name);
 
 	private:
@@ -95,6 +99,6 @@ namespace Mesh {
 		Shader::ProgramPtr progStaticMesh;
 	};
 
-	void Draw(const FilePtr&, const glm::mat4& matVP, const glm::mat4& matM);
+	void Draw(const FilePtr&, const glm::mat4& matM);
 }//namespace Mesh
 #endif // !MESH_H_INCLUDED

@@ -50,6 +50,15 @@
     <ClCompile Include="Src\Mesh.cpp">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Terrain.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\json11\json11.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Actor.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Scene.h">
@@ -94,6 +103,15 @@
     <ClInclude Include="Src\Mesh.h">
       <Filter>Src</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Terrain.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\json11\json11.hpp">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Actor.h">
+      <Filter>Src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -118,6 +136,9 @@
       <Filter>Res</Filter>
     </Image>
     <Image Include="Res\font_1.tga">
+      <Filter>Res</Filter>
+    </Image>
+    <Image Include="Res\Terrain.tga">
       <Filter>Res</Filter>
     </Image>
   </ItemGroup>

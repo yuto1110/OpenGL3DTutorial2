@@ -1,16 +1,66 @@
 /**
  @file Texture.cpp
 */
+#define NONIMAX
 #include "Texture.h"
 #include <GL/glew.h>
 #include<stdint.h>
 #include<vector>
 #include<fstream>
 #include <iostream>
+#include <algorithm>
 
 /// テクスチャ関連の関数やクラスを格納する名前空間.
 namespace Texture
 {
+	/**
+	*色データを取得する
+	*/
+	glm::vec4 ImageData::GetColer(int x, int y)const {
+		//座標を画像の範囲に制限
+		x = std::max(0, std::min(x, width - 1));
+		y = std::max(0, std::min(y, height - 1));
+
+		if (type == GL_UNSIGNED_BYTE) {
+			//各職1バイトのデータ
+			glm::vec4 color(0, 0, 0, 255);
+			if (format == GL_BGRA) {
+				//BGRAの順番で1バイトずつ、合計4バイト格納されている
+				const uint8_t*p = &data[x * 4 + y * (width * 4)];
+				color.b = p[0];
+				color.g = p[1];
+				color.r = p[2];
+				color.a = p[3];
+			}
+			else if (format == GL_BGR) {
+				//BGRの順番で1バイトずつ合計3バイト格納されている
+				const uint8_t*p = &data[x * 3 + y * (width * 3)];
+				color.b = p[0];
+				color.g = p[1];
+				color.r = p[2];
+			}
+			else if (format == GL_RED) {
+				//赤色だけ合計1バイト格納されている
+				color.r = data[x + y * width];
+				}
+			return color / 255.0f;
+		}
+		else if (type == GL_UNSIGNED_SHORT_1_5_5_5_REV) {
+			//色が2バイトに詰め込まれたデータ
+			glm::vec4 color(0, 0, 0, 1);
+			const uint8_t*p = &data[x * 2 + y * (width * 2)];
+			const uint16_t c = p[0] + p[1] * 0x100;//2つのバイトで結合
+			if (format == GL_BGRA) {
+				//16ビットのデータから各色を取り出す
+				color.b = static_cast<float>((c & 0b0000'0000'0001'1111));
+				color.g = static_cast<float>((c & 0b0000'0011'1110'0000) >> 5);
+				color.r = static_cast<float>((c & 0b0111'1100'0000'0000) >> 10);
+				color.a = static_cast<float>((c & 0b1000'0000'0000'0000) >> 15);
+			}
+			return color / glm::vec4(31.0f, 31.0f, 31.0f, 1.0f);
+			}
+		return glm::vec4(0, 0, 0, 1);
+	}
 	/*
 	2Dテクスチャを作成する.
 
@@ -74,6 +124,16 @@ namespace Texture
 */
 	GLuint LoadImage2D(const char*path)
 	{
+		ImageData imageData;
+		if (!LoadImage2D(path, &imageData)) {
+			return 0;
+		}
+		return CreateImage2D(imageData.width, imageData.height, imageData.data.data(), imageData.format, imageData.type);
+	}
+	/**
+	*ファイルから画像データを読み込む
+	*/
+	bool LoadImage2D(const char*path,ImageData*imageData){
 		//TGAヘッダを読み込む.
 		std::basic_ifstream<uint8_t>ifs;
 		ifs.open(path, std::ios_base::binary);
@@ -136,7 +196,12 @@ namespace Texture
 		{
 			type = GL_UNSIGNED_SHORT_1_5_5_5_REV;
 		}
-		return CreateImage2D(width, height, buf.data(),format,type);
+		imageData->width = width;
+		imageData->height = height;
+		imageData->format = format;
+		imageData->type = type;
+		imageData->data.swap(buf);
+		return true;
 	}
 
 	/**

@@ -33,8 +33,8 @@ void GameOverScene::Update(float deltaTime) {
 	const float h = window.Height();
 	const float lineHeight = fontRenderer.LineHeight();
 	fontRenderer.BeginUpdate();
-	fontRenderer.AddString(glm::vec2(-w * 0.5f + 32, h * 0.5f - lineHeight), L"ゲームオーバー画面");
-	fontRenderer.AddString(glm::vec2(-128, 0), L"アクションゲーム");
+	fontRenderer.AddString(glm::vec2(-w * 0.5f + 32, h * 0.5f - lineHeight), glm::vec4(1, 1, 0, 1), L"ゲームオーバー画面");
+	fontRenderer.AddString(glm::vec2(-128, 0), glm::vec4(1, 1, 0, 1), L"アクションゲーム");
 	fontRenderer.EndUpdate();
 }
 /**

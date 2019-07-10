@@ -142,7 +142,7 @@ bool FontRenderer::AddString(const glm::vec2&position,const glm::vec4&color, con
 			Sprite sprite(textures[info.page]);
 			sprite.Position(spritePos);
 			sprite.Rectangle({ info.uv,info.size });
-			sprite.Color();
+			sprite.Color(col);
 			if (!spriteRenderer.AddVertices(sprite)) {
 				return false;
 			}
