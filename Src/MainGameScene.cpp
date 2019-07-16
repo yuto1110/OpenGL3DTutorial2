@@ -2,6 +2,8 @@
 #include"StatusScene.h"
 #include"GameOverScene.h"
 #include"GLFWEW.h"
+#include<glm\gtc\constants.hpp>
+#include<random>
 #include<glm/gtc/matrix_transform.hpp>
 
 bool MainGameScene::Initialize() {
@@ -14,13 +16,40 @@ bool MainGameScene::Initialize() {
 	fontRenderer.LoadFromFile("Res/font.fnt");
 	meshBuffer.Init(1'000'000 * sizeof(Mesh::Vertex), 3'000'000 * sizeof(GLshort));
 	meshBuffer.LoadMesh("Res/red_pine_tree.gltf");
-
+	meshBuffer.LoadMesh("Res/bikuni.gltf");
+	meshBuffer.LoadMesh("Res/oni_small.gltf");
 	//ハイトマップを作成する
 	if (!heightMap.LoadFromFile("Res/Terrain.tga", 20.0f, 0.5f)) {
 		return false;
 	}
 	if (!heightMap.CreateMesh(meshBuffer, "Terrain")) {
 		return false;
+	}
+
+	glm::vec3 startPos(100, 0, 100);
+	startPos.y = heightMap.Height(startPos);
+	player = std::make_shared<StaticMeshActor>(meshBuffer.GetFile("Res/bikuni.gltf"), "player", 20, startPos);
+
+	std::mt19937 rand;
+	rand.seed(0);
+
+	//敵の配置
+	{
+		const size_t oniCount = 100;
+		enemies.Reserve(oniCount);
+		const Mesh::FilePtr mesh = meshBuffer.GetFile("Res/oni_small.gltf");
+		for (size_t i = 0; i < oniCount; ++i) {
+			//敵の位置を(50,50)-(150,150)の範囲からランダムに選択
+			glm::vec3 position(0);
+			position.x = std::uniform_real_distribution<float>(50, 150)(rand);
+			position.z = std::uniform_real_distribution<float>(50, 150)(rand);
+			position.y = heightMap.Height(position);
+			//敵の向きをランダムに選択
+			glm::vec3 rotation(0);
+			rotation.y = std::uniform_real_distribution<float>(0, 6.3f)(rand);
+			StaticMeshActorPtr p = std::make_shared<StaticMeshActor>(mesh, "Kooni", 13, position, rotation);
+			enemies.Add(p);
+		}
 	}
 	return true;
 }
@@ -81,6 +110,11 @@ void MainGameScene::Update(float deltaTime) {
 		camera.target.y = heightMap.Height(camera.target);
 		camera.position = camera.target + glm::vec3(0, 50, 50);
 	}
+
+	player->Update(deltaTime);
+	enemies.Update(deltaTime);
+	player->UpdateDrawData(deltaTime);
+	enemies.UpdateDrawData(deltaTime);
 	fontRenderer.BeginUpdate();
 	fontRenderer.AddString(glm::vec2(-w * 0.5f + 32, h * 0.5f - lineHeight), glm::vec4(1, 1, 0, 1), L"メイン画面");
 	fontRenderer.AddString(glm::vec2(-128, 0),glm::vec4(1,1,0,1), L"アクションゲーム");
@@ -102,15 +136,17 @@ void MainGameScene::Render()
 	const glm::mat4 matProj = glm::perspective(glm::radians(30.0f), aspectRaito, 1.0f, 1000.0f);
 	glm::vec3 cubePos(100, 0, 100);
 	cubePos.y = heightMap.Height(cubePos);
-	const glm::mat4 matModel = glm::translate(glm::mat4(1), cubePos);
-//	Mesh::Draw(meshBuffer.GetFile("Cube"), matProj*matView, matModel);
+	const glm::mat4 matModel = glm::translate(glm::mat4(1), cubePos);	
 	meshBuffer.SetViewProjectionMatrix(matProj*matView);
-	
-	
-	//Mesh::Draw(meshBuffer.GetFile("Terrain"), matProj*matView, glm::mat4(1));
+	Mesh::Draw(meshBuffer.GetFile("Cube"),  matModel);
+
 	meshBuffer.SetViewProjectionMatrix(matProj*matView);
+	Mesh::Draw(meshBuffer.GetFile("Terrain"), glm::mat4(1));
+	
 	glm::vec3 treePos(110, 0, 110);
 	treePos.y = heightMap.Height(treePos);
 	const glm::mat4 matTreeModel = glm::translate(glm::mat4(1), treePos)*glm::scale(glm::mat4(1), glm::vec3(3));
-	//Mesh::Draw(meshBuffer.GetFile("Res/red_pine_tree.gltf"), matProj*matView, matTreeModel);
+	Mesh::Draw(meshBuffer.GetFile("Res/red_pine_tree.gltf"),  matTreeModel);
+	player->Draw();
+	enemies.Draw();
 }
